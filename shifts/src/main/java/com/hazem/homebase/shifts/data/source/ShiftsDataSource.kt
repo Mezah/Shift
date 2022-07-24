@@ -5,13 +5,13 @@ import androidx.annotation.RawRes
 import com.google.gson.Gson
 import com.hazem.homebase.shifts.models.Shifts
 
-class ShiftsDataSource(
+internal class ShiftsDataSource(
     private val context: Context,
     private val gson: Gson,
     @RawRes private val resourceId: Int
-) {
+) : DataSource<Shifts> {
 
-    fun loadData(): Result<Shifts> {
+    override fun loadData(): Result<Shifts> {
         return kotlin.runCatching {
             context.resources.openRawResource(resourceId)
                 .bufferedReader().use { buffer ->

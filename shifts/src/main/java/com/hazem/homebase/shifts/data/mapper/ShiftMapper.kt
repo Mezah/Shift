@@ -7,7 +7,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ShiftMapper : Mapper<Shift, ShiftViewModel> {
+internal class ShiftMapper : Mapper<Shift, ShiftViewModel> {
     private val fromDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault())
     private val toDateFormat = SimpleDateFormat("EEE, MMMM d aaa", Locale.getDefault())
     override fun from(input: Shift): ShiftViewModel {
