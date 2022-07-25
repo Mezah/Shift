@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/shiftsListFragment">
+
+    <fragment
+        android:id="@+id/shiftsListFragment"
+        android:name="com.hazem.homebase.shiftapp.listscreen.ShiftsListFragment"
+        android:label="ShiftsListFragment" >
+        <action
+            android:id="@+id/action_shiftsListFragment_to_shiftDetailFragment"
+            app:destination="@id/shiftDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/shiftDetailFragment"
+        android:name="com.hazem.homebase.shiftapp.detailscreen.ShiftDetailFragment"
+        android:label="ShiftDetailFragment" />
+</navigation>
