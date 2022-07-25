@@ -2,4 +2,5 @@
     <string name="app_name">Shiftapp</string>
     <string name="from">From</string>
     <string name="to">To</string>
+    <string name="list_screen_title">Coffee Co Shifts</string>
 </resources>

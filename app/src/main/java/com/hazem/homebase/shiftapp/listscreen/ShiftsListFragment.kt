@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hazem.homebase.shiftapp.databinding.FragmentShiftsListLayoutBinding
@@ -15,7 +16,7 @@ class ShiftsListFragment : Fragment() {
 
     private lateinit var binding: FragmentShiftsListLayoutBinding
     private val shiftAdapter = ShiftsListAdapter()
-    val list = mutableListOf<ShiftViewModel>()
+    private val list = mutableListOf<ShiftViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +34,9 @@ class ShiftsListFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding.createShiftBtn.setOnClickListener {
+            findNavController().navigate(ShiftsListFragmentDirections.actionShiftsListFragmentToShiftDetailFragment())
+        }
         binding.shiftsList.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             adapter = shiftAdapter
