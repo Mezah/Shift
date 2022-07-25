@@ -8,12 +8,21 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hazem.homebase.shiftapp.databinding.FragmentShiftsListLayoutBinding
+import com.hazem.homebase.shifts.di.ShiftsModule
+import com.hazem.homebase.shifts.models.ShiftViewModel
 
 class ShiftsListFragment : Fragment() {
 
     private lateinit var binding: FragmentShiftsListLayoutBinding
     private val shiftAdapter = ShiftsListAdapter()
+    val list = mutableListOf<ShiftViewModel>()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val l = ShiftsModule.loadShiftViewModelListUseCase.loadShiftsViewModelList().getOrDefault(
+            emptyList())
+        list.addAll(l)
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -28,5 +37,6 @@ class ShiftsListFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             adapter = shiftAdapter
         }
+        shiftAdapter.addShiftList(list)
     }
 }

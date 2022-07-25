@@ -35,6 +35,15 @@ class ShiftsListViewHolder(private val binding: ItemShiftListBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
     fun bindData(shiftViewModel: ShiftViewModel) {
+        binding.apply {
+            title.text = shiftViewModel.title
+            subtitle.text = shiftViewModel.subtitle
+            date.text = shiftViewModel.shiftStartDate
+            from.text =
+                "${shiftViewModel.shiftStartTime.hour} ${shiftViewModel.shiftStartTime.dayPeriod}"
 
+            to.text =
+                "${shiftViewModel.shiftEndTime.hour} ${shiftViewModel.shiftEndTime.dayPeriod}"
+        }
     }
 }
