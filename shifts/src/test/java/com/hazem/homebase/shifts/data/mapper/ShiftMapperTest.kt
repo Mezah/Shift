@@ -21,7 +21,7 @@ class ShiftMapperTest {
             color = "red"
         )
         val shiftViewModel = shiftMapper.from(shift)
-        Assert.assertEquals("TestName's Shift", shiftViewModel.title)
+        Assert.assertEquals("TestName", shiftViewModel.title)
         Assert.assertEquals("TestRole", shiftViewModel.subtitle)
         Assert.assertEquals("Sat, April 21", shiftViewModel.shiftStartDate)
         Assert.assertEquals("Sat, April 21", shiftViewModel.shiftEndDate)
@@ -40,7 +40,7 @@ class ShiftMapperTest {
             color = "red"
         )
         val shiftViewModel = shiftMapper.from(shift)
-        Assert.assertEquals("TestName's Shift", shiftViewModel.title)
+        Assert.assertEquals("TestName", shiftViewModel.title)
         Assert.assertEquals("TestRole", shiftViewModel.subtitle)
         Assert.assertEquals("N/A", shiftViewModel.shiftStartDate)
         Assert.assertEquals("N/A", shiftViewModel.shiftEndDate)
@@ -61,7 +61,7 @@ class ShiftMapperTest {
             color = "NoColor"
         )
         val shiftViewModel = shiftMapper.from(shift)
-        Assert.assertEquals("TestName's Shift", shiftViewModel.title)
+        Assert.assertEquals("TestName", shiftViewModel.title)
         Assert.assertEquals("TestRole", shiftViewModel.subtitle)
         Assert.assertEquals("Fri, April 20", shiftViewModel.shiftStartDate)
         Assert.assertEquals("Fri, April 20", shiftViewModel.shiftEndDate)

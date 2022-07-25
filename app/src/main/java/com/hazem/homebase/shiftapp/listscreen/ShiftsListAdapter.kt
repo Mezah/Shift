@@ -2,6 +2,9 @@ package com.hazem.homebase.shiftapp.listscreen
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.text.buildSpannedString
+import androidx.core.text.color
 import androidx.recyclerview.widget.RecyclerView
 import com.hazem.homebase.shiftapp.databinding.ItemShiftListBinding
 import com.hazem.homebase.shifts.models.ShiftViewModel
@@ -36,7 +39,20 @@ class ShiftsListViewHolder(private val binding: ItemShiftListBinding) :
 
     fun bindData(shiftViewModel: ShiftViewModel) {
         binding.apply {
-            title.text = shiftViewModel.title
+            val ss = buildSpannedString {
+                append(shiftViewModel.title)
+                    .append("'s ")
+                    .color(
+                        ContextCompat.getColor(
+                            binding.root.context,
+                            shiftViewModel.color.colorId
+                        )
+                    ) {
+                        append("Shift")
+                    }
+
+            }
+            title.text = ss
             subtitle.text = shiftViewModel.subtitle
             date.text = shiftViewModel.shiftStartDate
             from.text =

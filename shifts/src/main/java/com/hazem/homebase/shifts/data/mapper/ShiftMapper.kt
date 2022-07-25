@@ -13,7 +13,7 @@ internal class ShiftMapper : Mapper<Shift, ShiftViewModel> {
         }
 
     override fun from(input: Shift): ShiftViewModel {
-        val title = "${input.name}'s Shift"
+        val title = input.name
         val startDateConverted = convertDate(input.startDate)
         val endDateConverted = convertDate(input.endData)
         val startHour = getHour(input.startDate)
