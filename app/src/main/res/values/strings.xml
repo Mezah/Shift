@@ -6,4 +6,5 @@
     <string name="choose">Choose</string>
     <string name="in_role">In Role</string>
     <string name="with_color">With Color</string>
+    <string name="create_new_shift">Add New Shift</string>
 </resources>
