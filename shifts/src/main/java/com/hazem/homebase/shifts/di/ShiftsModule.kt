@@ -8,7 +8,8 @@ import com.hazem.homebase.shifts.data.mapper.NewShiftMapper
 import com.hazem.homebase.shifts.data.mapper.ShiftMapper
 import com.hazem.homebase.shifts.data.source.ShiftsDataSource
 import com.hazem.homebase.shifts.usecases.CreateNewShiftUseCase
-import com.hazem.homebase.shifts.usecases.LoadShiftViewModelListUseCase
+import com.hazem.homebase.shifts.usecases.LoadShiftListUseCase
+import com.hazem.homebase.shifts.usecases.LoadShiftListViewModelUseCase
 import java.lang.ref.WeakReference
 
 object ShiftsModule : (Context) -> Unit {
@@ -17,15 +18,6 @@ object ShiftsModule : (Context) -> Unit {
     private lateinit var context: WeakReference<Context>
     private val gson = Gson()
     private lateinit var appDatabase: AppDatabase
-
-    val loadShiftViewModelListUseCase: LoadShiftViewModelListUseCase
-        get() {
-            val context = context.get()
-                ?: throw IllegalArgumentException(
-                    "Context cannot be null, initialize ShiftsModule first"
-                )
-            return createShiftViewModelListUseCase(context)
-        }
 
     val createNewShiftUseCase: CreateNewShiftUseCase
         get() {
@@ -36,12 +28,23 @@ object ShiftsModule : (Context) -> Unit {
             return createNewShiftUseCase(appDatabase)
         }
 
+    val loadShiftViewModelListUseCase: LoadShiftListViewModelUseCase
+        get() {
+            if (!::appDatabase.isInitialized)
+                throw IllegalArgumentException(
+                    "Database is not created, initialize ShiftsModule first"
+                )
+            return LoadShiftListViewModelUseCase(appDatabase, ShiftMapper())
+        }
+
     override fun invoke(p1: Context) {
         context = WeakReference(p1)
         appDatabase = Room.databaseBuilder(
             context.get()!!,
             AppDatabase::class.java, DATABASE_NAME
         ).build()
+
+        createShiftViewModelListUseCase(appDatabase).loadShiftsViewModelList()
     }
 
     private fun createNewShiftUseCase(appDatabase: AppDatabase): CreateNewShiftUseCase {
@@ -50,9 +53,19 @@ object ShiftsModule : (Context) -> Unit {
         return CreateNewShiftUseCase(appDatabase, newShiftMapper)
     }
 
-    private fun createShiftViewModelListUseCase(context: Context): LoadShiftViewModelListUseCase {
+    private fun createShiftViewModelListUseCase(
+        appDatabase: AppDatabase
+    ): LoadShiftListUseCase {
+        val context = ShiftsModule.context.get()
+            ?: throw IllegalArgumentException(
+                "Context cannot be null, initialize ShiftsModule first"
+            )
+        if (!::appDatabase.isInitialized)
+            throw IllegalArgumentException(
+                "Database is not created, initialize ShiftsModule first"
+            )
+
         val dataSource = ShiftsDataSource(context, gson, com.hazem.homebase.shifts.R.raw.shifts)
-        val mapper = ShiftMapper()
-        return LoadShiftViewModelListUseCase(dataSource, mapper)
+        return LoadShiftListUseCase(dataSource, appDatabase)
     }
 }

@@ -56,13 +56,13 @@ class CreateNewShiftFragment : Fragment() {
             roleList.adapter = ad3
         }
 
-        val itemsList =
-            ShiftsModule.loadShiftViewModelListUseCase.loadShiftsViewModelList().getOrDefault(
-                emptyList()
-            )
-        val names = itemsList.map { it.title }
-        val roles = itemsList.map { it.subtitle }
-        val colors = itemsList.map { it.color.colorName }
+//        val itemsList =
+//            ShiftsModule.loadShiftViewModelListUseCase.loadShiftsViewModelList().getOrDefault(
+//                emptyList()
+//            )
+//        val names = itemsList.map { it.title }
+//        val roles = itemsList.map { it.subtitle }
+//        val colors = itemsList.map { it.color.colorName }
 
     }
 }
