@@ -14,6 +14,6 @@
     </fragment>
     <fragment
         android:id="@+id/shiftDetailFragment"
-        android:name="com.hazem.homebase.shiftapp.detailscreen.ShiftDetailFragment"
+        android:name="com.hazem.homebase.shiftapp.detailscreen.CreateNewShiftFragment"
         android:label="ShiftDetailFragment" />
 </navigation>

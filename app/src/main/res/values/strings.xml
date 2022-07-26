@@ -3,4 +3,7 @@
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="list_screen_title">Coffee Co Shifts</string>
+    <string name="choose">Choose</string>
+    <string name="in_role">In Role</string>
+    <string name="with_color">With Color</string>
 </resources>
