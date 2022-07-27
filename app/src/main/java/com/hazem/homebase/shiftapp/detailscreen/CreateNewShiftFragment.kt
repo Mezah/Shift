@@ -1,5 +1,6 @@
 package com.hazem.homebase.shiftapp.detailscreen
 
+import android.R
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import android.widget.DatePicker
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.hazem.homebase.shiftapp.databinding.FragmentCreateShiftBinding
 import com.hazem.homebase.shiftapp.models.AppResults
 import com.hazem.homebase.shifts.di.ShiftsModule
@@ -44,18 +46,33 @@ class CreateNewShiftFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        liveDateObservers()
+        selectListeners()
+        clickListeners()
+    }
+
+    private fun selectListeners() {
+        binding.apply {
+            employeeList.onItemSelectedListener = this@CreateNewShiftFragment
+            colorList.onItemSelectedListener = this@CreateNewShiftFragment
+            roleList.onItemSelectedListener = this@CreateNewShiftFragment
+
+        }
+    }
+
+    private fun liveDateObservers() {
         vm.apply {
             namesLd.observe(viewLifecycleOwner) {
                 when (it) {
                     is AppResults.Success -> {
                         val ad = ArrayAdapter(
                             requireContext(),
-                            android.R.layout.simple_spinner_item,
+                            R.layout.simple_spinner_item,
                             it.result
                         )
 
                         ad.setDropDownViewResource(
-                            android.R.layout.simple_spinner_dropdown_item
+                            R.layout.simple_spinner_dropdown_item
                         )
                         binding.employeeList.adapter = ad
                     }
@@ -73,12 +90,12 @@ class CreateNewShiftFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                     is AppResults.Success -> {
                         val ad = ArrayAdapter(
                             requireContext(),
-                            android.R.layout.simple_spinner_item,
+                            R.layout.simple_spinner_item,
                             it.result
                         )
 
                         ad.setDropDownViewResource(
-                            android.R.layout.simple_spinner_dropdown_item
+                            R.layout.simple_spinner_dropdown_item
                         )
                         binding.colorList.adapter = ad
                     }
@@ -91,18 +108,17 @@ class CreateNewShiftFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                     }
                 }
             }
-
             rolesLd.observe(viewLifecycleOwner) {
                 when (it) {
                     is AppResults.Success -> {
                         val ad = ArrayAdapter(
                             requireContext(),
-                            android.R.layout.simple_spinner_item,
+                            R.layout.simple_spinner_item,
                             it.result
                         )
 
                         ad.setDropDownViewResource(
-                            android.R.layout.simple_spinner_dropdown_item
+                            R.layout.simple_spinner_dropdown_item
                         )
                         binding.roleList.adapter = ad
                     }
@@ -115,45 +131,40 @@ class CreateNewShiftFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                     }
                 }
             }
-
-        }
-
-        binding.apply {
-            employeeList.onItemSelectedListener = this@CreateNewShiftFragment
-            colorList.onItemSelectedListener = this@CreateNewShiftFragment
-            roleList.onItemSelectedListener = this@CreateNewShiftFragment
-
-        }
-        vm.createNewShift.observe(viewLifecycleOwner) {
-            when (it) {
-                AppResults.EmptyColor -> Toast.makeText(
-                    requireContext(),
-                    "Select a Color",
-                    Toast.LENGTH_LONG
-                ).show()
-                AppResults.EmptyEndDate -> Toast.makeText(
-                    requireContext(),
-                    "Select a End Date",
-                    Toast.LENGTH_LONG
-                ).show()
-                AppResults.EmptyName -> Toast.makeText(
-                    requireContext(),
-                    "Select a name",
-                    Toast.LENGTH_LONG
-                ).show()
-                AppResults.EmptyRole -> Toast.makeText(
-                    requireContext(),
-                    "Select a Role",
-                    Toast.LENGTH_LONG
-                ).show()
-                AppResults.EmptyStartDate -> Toast.makeText(
-                    requireContext(),
-                    "Select a Start date",
-                    Toast.LENGTH_LONG
-                ).show()
-                else -> return@observe
+            createNewShift.observe(viewLifecycleOwner) {
+                when (it) {
+                    AppResults.EmptyColor -> Toast.makeText(
+                        requireContext(),
+                        "Select a Color",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    AppResults.EmptyEndDate -> Toast.makeText(
+                        requireContext(),
+                        "Select a End Date",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    AppResults.EmptyName -> Toast.makeText(
+                        requireContext(),
+                        "Select a name",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    AppResults.EmptyRole -> Toast.makeText(
+                        requireContext(),
+                        "Select a Role",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    AppResults.EmptyStartDate -> Toast.makeText(
+                        requireContext(),
+                        "Select a Start date",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    else -> return@observe
+                }
             }
         }
+    }
+
+    private fun clickListeners() {
         binding.toCalendar.setOnClickListener {
             toDate = true
             createDatePickerDialog().show()
@@ -166,6 +177,10 @@ class CreateNewShiftFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
         binding.save.setOnClickListener {
             vm.createNewShift()
+            Toast.makeText(requireContext(), "Shift added", Toast.LENGTH_SHORT).show()
+        }
+        binding.back.setOnClickListener {
+            findNavController().popBackStack()
         }
     }
 

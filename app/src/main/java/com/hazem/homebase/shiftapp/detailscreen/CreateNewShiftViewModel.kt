@@ -80,10 +80,9 @@ class CreateNewShiftViewModel(
     }
 
     fun createNewShift() {
-        val result = validateData()
-        if (!result)
+        val result = invalidData()
+        if (result)
             return
-
         viewModelScope.launch(Dispatchers.IO) {
             createNewShiftUseCase.addNewShift(
                 NewShift(
@@ -97,27 +96,27 @@ class CreateNewShiftViewModel(
         }
     }
 
-    private fun validateData(): Boolean {
+    private fun invalidData(): Boolean {
         val result = when {
             shiftInfo.name.isEmpty() -> {
                 _createNewShift.value = AppResults.EmptyName
-                false
+                true
             }
             shiftInfo.role.isEmpty() -> {
                 _createNewShift.value = AppResults.EmptyRole
-                false
+                true
             }
             shiftInfo.color.isEmpty() -> {
                 _createNewShift.value = AppResults.EmptyColor
-                false
+                true
             }
             shiftInfo.start == null -> {
                 _createNewShift.value = AppResults.EmptyStartDate
-                false
+                true
             }
             shiftInfo.end == null -> {
                 _createNewShift.value = AppResults.EmptyEndDate
-                false
+                true
             }
             else -> false
         }

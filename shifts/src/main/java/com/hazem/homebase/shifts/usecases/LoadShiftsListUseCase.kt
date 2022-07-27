@@ -24,11 +24,12 @@ internal class LoadShiftListUseCase(
                 val colors = shifts.shifts.map { ShiftColor(color = it.color) }.distinct()
                 val roles = shifts.shifts.map { EmployeeRoles(role = it.role) }.distinct()
                 executor.execute {
-                    if(shiftDao().getAll().isNotEmpty())
-                        shiftDao().addShifts(shifts.shifts)
-                    namesDao().addNames(names)
-                    colorsDao().addColors(colors)
-                    rolesDao().addRoles(roles)
+                    if (namesDao().getAll().isEmpty())
+                        namesDao().addNames(names)
+                    if (colorsDao().getAll().isEmpty())
+                        colorsDao().addColors(colors)
+                    if (rolesDao().getAll().isEmpty())
+                        rolesDao().addRoles(roles)
                 }
             }
             shifts
