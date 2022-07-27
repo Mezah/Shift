@@ -1,17 +1,32 @@
 package com.hazem.homebase.shiftapp.detailscreen
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.DatePicker
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.hazem.homebase.shiftapp.databinding.FragmentCreateShiftBinding
+import com.hazem.homebase.shiftapp.models.AppResults
 import com.hazem.homebase.shifts.di.ShiftsModule
+import java.util.*
 
-class CreateNewShiftFragment : Fragment() {
+class CreateNewShiftFragment : Fragment(), DatePickerDialog.OnDateSetListener,
+    AdapterView.OnItemSelectedListener {
 
     private lateinit var binding: FragmentCreateShiftBinding
+    private val calendar = Calendar.getInstance().apply { time = Date() }
+    private var fromDate: Boolean = false
+    private var toDate: Boolean = false
+
+    private val vm: CreateNewShiftViewModel by viewModels {
+        NewShiftVmFactory(ShiftsModule.shiftInfoUseCase)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,44 +40,138 @@ class CreateNewShiftFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val ad = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            mutableListOf("Name 1", "Name 2", "Name 3")
-        )
+        vm.apply {
+            namesLd.observe(viewLifecycleOwner) {
+                when (it) {
+                    is AppResults.Success -> {
+                        val ad = ArrayAdapter(
+                            requireContext(),
+                            android.R.layout.simple_spinner_item,
+                            it.result
+                        )
 
-        val ad2 = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            mutableListOf("Role 1", "Role 2", "Role 3")
-        )
+                        ad.setDropDownViewResource(
+                            android.R.layout.simple_spinner_dropdown_item
+                        )
+                        binding.employeeList.adapter = ad
+                    }
+                    else -> {
+                        Toast.makeText(
+                            requireContext(),
+                            "An Error Loading names",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+            colorsLd.observe(viewLifecycleOwner) {
+                when (it) {
+                    is AppResults.Success -> {
+                        val ad = ArrayAdapter(
+                            requireContext(),
+                            android.R.layout.simple_spinner_item,
+                            it.result
+                        )
 
-        val ad3 = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            mutableListOf("Color 1", "Color 2", "Color")
-        )
+                        ad.setDropDownViewResource(
+                            android.R.layout.simple_spinner_dropdown_item
+                        )
+                        binding.colorList.adapter = ad
+                    }
+                    else -> {
+                        Toast.makeText(
+                            requireContext(),
+                            "An Error Loading names",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
 
-        ad.setDropDownViewResource(
-            android.R.layout.simple_spinner_dropdown_item)
-        ad2.setDropDownViewResource(
-            android.R.layout.simple_spinner_dropdown_item)
-        ad3.setDropDownViewResource(
-            android.R.layout.simple_spinner_dropdown_item)
+            rolesLd.observe(viewLifecycleOwner) {
+                when (it) {
+                    is AppResults.Success -> {
+                        val ad = ArrayAdapter(
+                            requireContext(),
+                            android.R.layout.simple_spinner_item,
+                            it.result
+                        )
 
-        binding.apply {
-            employeeList.adapter = ad
-            colorList.adapter = ad2
-            roleList.adapter = ad3
+                        ad.setDropDownViewResource(
+                            android.R.layout.simple_spinner_dropdown_item
+                        )
+                        binding.roleList.adapter = ad
+                    }
+                    else -> {
+                        Toast.makeText(
+                            requireContext(),
+                            "An Error Loading names",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+
         }
 
-//        val itemsList =
-//            ShiftsModule.loadShiftViewModelListUseCase.loadShiftsViewModelList().getOrDefault(
-//                emptyList()
-//            )
-//        val names = itemsList.map { it.title }
-//        val roles = itemsList.map { it.subtitle }
-//        val colors = itemsList.map { it.color.colorName }
+        binding.apply {
+            employeeList.onItemSelectedListener = this@CreateNewShiftFragment
+            colorList.onItemSelectedListener = this@CreateNewShiftFragment
+            roleList.onItemSelectedListener = this@CreateNewShiftFragment
 
+        }
+        binding.toCalendar.setOnClickListener {
+            toDate = true
+            createDatePickerDialog().show()
+        }
+
+        binding.fromCalendar.setOnClickListener {
+            fromDate = true
+            createDatePickerDialog().show()
+        }
+    }
+
+    fun createDatePickerDialog(): DatePickerDialog {
+
+        return DatePickerDialog(
+            requireContext(),
+            this,
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+    }
+
+    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+        val cal = Calendar.getInstance()
+        cal.set(year, month, dayOfMonth)
+        val date = cal.time
+        if (fromDate) {
+            binding.fromDate.text = date.toString()
+        } else if (toDate) {
+            binding.toDate.text = date.toString()
+        }
+        fromDate = false
+        toDate = false
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        if (view == null)
+            return
+        when {
+            view.id == binding.employeeList.id -> {
+
+            }
+            view.id == binding.colorList.id -> {
+
+            }
+            view.id == binding.roleList.id -> {
+
+            }
+            else -> return
+        }
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
     }
 }

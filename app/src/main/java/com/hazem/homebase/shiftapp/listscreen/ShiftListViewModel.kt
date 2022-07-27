@@ -21,7 +21,7 @@ class ShiftListViewModel(private val shiftViewModelListUseCase: LoadShiftListVie
                     _listLiveData.postValue(AppResults.Success(it))
                 }.onFailure {
                     Log.d("ERROR_===",it.message ?: "")
-                    _listLiveData.postValue(AppResults.Failure)
+                    _listLiveData.postValue(AppResults.LoadingError)
                 }
         }
     }

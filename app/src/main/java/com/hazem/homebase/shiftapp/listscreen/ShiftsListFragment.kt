@@ -31,12 +31,12 @@ class ShiftsListFragment : Fragment() {
         viewModel.loadShiftList()
         viewModel.listLiveData.observe(viewLifecycleOwner) { listResult ->
             when (listResult) {
-                AppResults.Failure -> Toast.makeText(
+                is AppResults.Success -> shiftAdapter.addShiftList(listResult.result)
+                else -> Toast.makeText(
                     requireContext(),
                     "An Error Occurred",
                     Toast.LENGTH_SHORT
                 ).show()
-                is AppResults.Success -> shiftAdapter.addShiftList(listResult.result)
             }
         }
         return binding.root

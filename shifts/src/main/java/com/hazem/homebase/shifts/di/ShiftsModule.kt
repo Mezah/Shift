@@ -8,6 +8,7 @@ import com.hazem.homebase.shifts.data.mapper.NewShiftMapper
 import com.hazem.homebase.shifts.data.mapper.ShiftMapper
 import com.hazem.homebase.shifts.data.source.ShiftsDataSource
 import com.hazem.homebase.shifts.usecases.CreateNewShiftUseCase
+import com.hazem.homebase.shifts.usecases.LoadShiftInfoUseCase
 import com.hazem.homebase.shifts.usecases.LoadShiftListUseCase
 import com.hazem.homebase.shifts.usecases.LoadShiftListViewModelUseCase
 import java.lang.ref.WeakReference
@@ -19,21 +20,20 @@ object ShiftsModule : (Context) -> Unit {
     private val gson = Gson()
     private lateinit var appDatabase: AppDatabase
 
+    val shiftInfoUseCase: LoadShiftInfoUseCase
+        get() {
+            checkDbInstance()
+            return LoadShiftInfoUseCase(appDatabase)
+        }
     val createNewShiftUseCase: CreateNewShiftUseCase
         get() {
-            if (!::appDatabase.isInitialized)
-                throw IllegalArgumentException(
-                    "Database is not created, initialize ShiftsModule first"
-                )
+            checkDbInstance()
             return createNewShiftUseCase(appDatabase)
         }
 
     val loadShiftViewModelListUseCase: LoadShiftListViewModelUseCase
         get() {
-            if (!::appDatabase.isInitialized)
-                throw IllegalArgumentException(
-                    "Database is not created, initialize ShiftsModule first"
-                )
+            checkDbInstance()
             return LoadShiftListViewModelUseCase(appDatabase, ShiftMapper())
         }
 
@@ -60,12 +60,16 @@ object ShiftsModule : (Context) -> Unit {
             ?: throw IllegalArgumentException(
                 "Context cannot be null, initialize ShiftsModule first"
             )
+        checkDbInstance()
+
+        val dataSource = ShiftsDataSource(context, gson, com.hazem.homebase.shifts.R.raw.shifts)
+        return LoadShiftListUseCase(dataSource, appDatabase)
+    }
+
+    private fun checkDbInstance() {
         if (!::appDatabase.isInitialized)
             throw IllegalArgumentException(
                 "Database is not created, initialize ShiftsModule first"
             )
-
-        val dataSource = ShiftsDataSource(context, gson, com.hazem.homebase.shifts.R.raw.shifts)
-        return LoadShiftListUseCase(dataSource, appDatabase)
     }
 }
