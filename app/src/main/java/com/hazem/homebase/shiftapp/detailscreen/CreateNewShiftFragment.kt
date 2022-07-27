@@ -14,6 +14,7 @@ import androidx.fragment.app.viewModels
 import com.hazem.homebase.shiftapp.databinding.FragmentCreateShiftBinding
 import com.hazem.homebase.shiftapp.models.AppResults
 import com.hazem.homebase.shifts.di.ShiftsModule
+import java.text.SimpleDateFormat
 import java.util.*
 
 class CreateNewShiftFragment : Fragment(), DatePickerDialog.OnDateSetListener,
@@ -23,9 +24,12 @@ class CreateNewShiftFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     private val calendar = Calendar.getInstance().apply { time = Date() }
     private var fromDate: Boolean = false
     private var toDate: Boolean = false
+    private val sdf = SimpleDateFormat("EEE, MMMM d", Locale.getDefault()).apply {
+        timeZone = TimeZone.getTimeZone("GMT-08:00")
+    }
 
     private val vm: CreateNewShiftViewModel by viewModels {
-        NewShiftVmFactory(ShiftsModule.shiftInfoUseCase)
+        NewShiftVmFactory(ShiftsModule.shiftInfoUseCase, ShiftsModule.createNewShiftUseCase)
     }
 
     override fun onCreateView(
@@ -120,6 +124,36 @@ class CreateNewShiftFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             roleList.onItemSelectedListener = this@CreateNewShiftFragment
 
         }
+        vm.createNewShift.observe(viewLifecycleOwner) {
+            when (it) {
+                AppResults.EmptyColor -> Toast.makeText(
+                    requireContext(),
+                    "Select a Color",
+                    Toast.LENGTH_LONG
+                ).show()
+                AppResults.EmptyEndDate -> Toast.makeText(
+                    requireContext(),
+                    "Select a End Date",
+                    Toast.LENGTH_LONG
+                ).show()
+                AppResults.EmptyName -> Toast.makeText(
+                    requireContext(),
+                    "Select a name",
+                    Toast.LENGTH_LONG
+                ).show()
+                AppResults.EmptyRole -> Toast.makeText(
+                    requireContext(),
+                    "Select a Role",
+                    Toast.LENGTH_LONG
+                ).show()
+                AppResults.EmptyStartDate -> Toast.makeText(
+                    requireContext(),
+                    "Select a Start date",
+                    Toast.LENGTH_LONG
+                ).show()
+                else -> return@observe
+            }
+        }
         binding.toCalendar.setOnClickListener {
             toDate = true
             createDatePickerDialog().show()
@@ -129,9 +163,13 @@ class CreateNewShiftFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             fromDate = true
             createDatePickerDialog().show()
         }
+
+        binding.save.setOnClickListener {
+            vm.createNewShift()
+        }
     }
 
-    fun createDatePickerDialog(): DatePickerDialog {
+    private fun createDatePickerDialog(): DatePickerDialog {
 
         return DatePickerDialog(
             requireContext(),
@@ -147,26 +185,31 @@ class CreateNewShiftFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         cal.set(year, month, dayOfMonth)
         val date = cal.time
         if (fromDate) {
-            binding.fromDate.text = date.toString()
+            binding.fromDate.text = sdf.format(date)
+            vm.addStartDate(date)
         } else if (toDate) {
-            binding.toDate.text = date.toString()
+            binding.toDate.text = sdf.format(date)
+            vm.addEndDate(date)
         }
         fromDate = false
         toDate = false
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        if (view == null)
+        if (parent == null)
             return
-        when {
-            view.id == binding.employeeList.id -> {
-
+        when (parent.id) {
+            binding.employeeList.id -> {
+                val name = parent.adapter.getItem(position) as String
+                vm.addName(name)
             }
-            view.id == binding.colorList.id -> {
-
+            binding.colorList.id -> {
+                val color = parent.adapter.getItem(position) as String
+                vm.addColor(color)
             }
-            view.id == binding.roleList.id -> {
-
+            binding.roleList.id -> {
+                val role = parent.adapter.getItem(position) as String
+                vm.addRole(role)
             }
             else -> return
         }

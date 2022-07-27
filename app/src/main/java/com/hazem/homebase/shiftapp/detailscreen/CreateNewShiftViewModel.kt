@@ -2,33 +2,60 @@ package com.hazem.homebase.shiftapp.detailscreen
 
 import androidx.lifecycle.*
 import com.hazem.homebase.shiftapp.models.AppResults
+import com.hazem.homebase.shifts.models.Color
+import com.hazem.homebase.shifts.models.NewShift
+import com.hazem.homebase.shifts.usecases.CreateNewShiftUseCase
 import com.hazem.homebase.shifts.usecases.LoadShiftInfoUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
 data class ShiftInfo(
-    val name: String = "",
-    val role: String = "",
-    val color: String = "",
-    val start: Date? = null,
-    val end: Date? = null
+    var name: String = "",
+    var role: String = "",
+    var color: String = "",
+    var start: Date? = null,
+    var end: Date? = null
 )
 
-class CreateNewShiftViewModel(private val loadShiftInfoUseCase: LoadShiftInfoUseCase) :
+class CreateNewShiftViewModel(
+    private val loadShiftInfoUseCase: LoadShiftInfoUseCase,
+    private val createNewShiftUseCase: CreateNewShiftUseCase
+) :
     ViewModel() {
 
-    val shiftInfo = ShiftInfo()
+    private val shiftInfo = ShiftInfo()
 
-    private val _namesLd: MutableLiveData <AppResults<List<String>>> = MutableLiveData()
-    private val _rolesLd: MutableLiveData <AppResults<List<String>>> = MutableLiveData()
+    fun addName(name: String) {
+        shiftInfo.name = name
+    }
+
+    fun addColor(color: String) {
+        shiftInfo.color = color
+    }
+
+    fun addRole(role: String) {
+        shiftInfo.role = role
+    }
+
+    fun addStartDate(date: Date) {
+        shiftInfo.start = date
+    }
+
+    fun addEndDate(date: Date) {
+        shiftInfo.end = date
+    }
+
+    private val _namesLd: MutableLiveData<AppResults<List<String>>> = MutableLiveData()
+    private val _rolesLd: MutableLiveData<AppResults<List<String>>> = MutableLiveData()
     private val _colorsLd: MutableLiveData<AppResults<List<String>>> = MutableLiveData()
 
-    val namesLd: LiveData <AppResults<List<String>>> = _namesLd
-    val rolesLd: LiveData <AppResults<List<String>>> = _rolesLd
+    val namesLd: LiveData<AppResults<List<String>>> = _namesLd
+    val rolesLd: LiveData<AppResults<List<String>>> = _rolesLd
     val colorsLd: LiveData<AppResults<List<String>>> = _colorsLd
 
-    private val createNewShift: MutableLiveData<AppResults<Unit>> = MutableLiveData()
+    private val _createNewShift: MutableLiveData<AppResults<Unit>> = MutableLiveData()
+    val createNewShift: LiveData<AppResults<Unit>> = _createNewShift
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -56,28 +83,40 @@ class CreateNewShiftViewModel(private val loadShiftInfoUseCase: LoadShiftInfoUse
         val result = validateData()
         if (!result)
             return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            createNewShiftUseCase.addNewShift(
+                NewShift(
+                    shiftInfo.name,
+                    shiftInfo.role,
+                    Color.valueOf(shiftInfo.color.uppercase()),
+                    shiftInfo.start!!,
+                    shiftInfo.end!!
+                )
+            )
+        }
     }
 
     private fun validateData(): Boolean {
         val result = when {
             shiftInfo.name.isEmpty() -> {
-                createNewShift.value = AppResults.EmptyName
+                _createNewShift.value = AppResults.EmptyName
                 false
             }
             shiftInfo.role.isEmpty() -> {
-                createNewShift.value = AppResults.EmptyRole
+                _createNewShift.value = AppResults.EmptyRole
                 false
             }
             shiftInfo.color.isEmpty() -> {
-                createNewShift.value = AppResults.EmptyColor
+                _createNewShift.value = AppResults.EmptyColor
                 false
             }
             shiftInfo.start == null -> {
-                createNewShift.value = AppResults.EmptyStartDate
+                _createNewShift.value = AppResults.EmptyStartDate
                 false
             }
             shiftInfo.end == null -> {
-                createNewShift.value = AppResults.EmptyEndDate
+                _createNewShift.value = AppResults.EmptyEndDate
                 false
             }
             else -> false
@@ -86,8 +125,11 @@ class CreateNewShiftViewModel(private val loadShiftInfoUseCase: LoadShiftInfoUse
     }
 }
 
-class NewShiftVmFactory(private val useCase: LoadShiftInfoUseCase) : ViewModelProvider.Factory {
+class NewShiftVmFactory(
+    private val useCase: LoadShiftInfoUseCase,
+    private val createNewShiftUseCase: CreateNewShiftUseCase
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return CreateNewShiftViewModel(useCase) as T
+        return CreateNewShiftViewModel(useCase, createNewShiftUseCase) as T
     }
 }
